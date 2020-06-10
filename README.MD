@@ -28,6 +28,12 @@ $ python
 >>> db.create_all()
 ```
 
+- Start Server
+```
+$ pipenv shell
+$ python app.py
+```
+
 - Flask Routes
   - POST One Todo
     - http://localhost:5000/todo
