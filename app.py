@@ -10,24 +10,32 @@ heroku = Heroku(app)
 CORS(app)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace(
+        "postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URL
+
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-class Todo(db.Model):
-  __tablename__ = "todos"
-  id = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String(100), nullable=False)
-  done = db.Column(db.Boolean)
 
-  def __init__(self, title, done):
-    self.title = title
-    self.done = done
+class Todo(db.Model):
+    __tablename__ = "todos"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    done = db.Column(db.Boolean)
+
+    def __init__(self, title, done):
+        self.title = title
+        self.done = done
+
 
 class TodoSchema(ma.Schema):
-  class Meta:
-    fields = ("id", "title", "done")
+    class Meta:
+        fields = ("id", "title", "done")
+
 
 todo_schema = TodoSchema()
 todos_schema = TodoSchema(many=True)
